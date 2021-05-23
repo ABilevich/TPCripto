@@ -1,4 +1,4 @@
-CFLAGS= -Wall -Wextra -pedantic -pedantic-errors -O3 -std=c99 -Wno-unused-parameter -Wno-unused-result -Wno-unused-variable 
+CFLAGS= -Wall -Wextra -pedantic -pedantic-errors -O3 -std=gnu99 -Wno-unused-parameter -Wno-unused-result -Wno-unused-variable 
 CC=gcc
 
 all: main
