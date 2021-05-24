@@ -93,7 +93,7 @@ IMAGEDATA * analizeImage(char *path){
     //allocate enough memory for the bitmap image data
     IMAGEDATA * imageData = (IMAGEDATA*) malloc(sizeof(IMAGEDATA));
 
-    bitmapImage = (unsigned char*) malloc(infoHeader.biSizeImage);
+    bitmapImage = (unsigned char*) malloc(infoHeader.biWidth * infoHeader.biHeight);
 
     //verify memory allocation
     if (!bitmapImage)
@@ -104,7 +104,7 @@ IMAGEDATA * analizeImage(char *path){
     }
 
     //read in the bitmap image data
-    fread(bitmapImage,1,infoHeader.biSizeImage,fp);
+    fread(bitmapImage,1,infoHeader.biWidth * infoHeader.biHeight,fp);
 
     //make sure bitmap image data was read
     if (bitmapImage == NULL)
@@ -120,7 +120,7 @@ IMAGEDATA * analizeImage(char *path){
     
 //////////////////////////////////////////
 
-	// for(int i =0; i< (int) (infoHeader.biWidth * infoHeader.biHeight); i++){
+	// for(int i =0; i< (int) (imageData->biSize); i++){
 	// 	if(i%infoHeader.biWidth == 0){
 	// 		printf("\n");
 	// 	}
