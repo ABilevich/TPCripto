@@ -3,8 +3,8 @@ CC=gcc
 
 all: main
 
-main: src/main.o src/images.o
-	$(CC) src/main.c src/images.c $(CFLAGS) -o main
+main: src/main.o src/images.o src/galois_8.o
+	$(CC) src/main.c src/images.c src/galois_8.c $(CFLAGS) -o main
 
 clean:
-	 rm src/main.o src/images.o main
+	 rm src/main.o src/images.o src/galois_8.o main

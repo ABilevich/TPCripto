@@ -3,7 +3,9 @@
 #include <string.h>
 #include "include/images.h"
 #include "include/main.h"
+#include "include/galois_8.h"
 #include <dirent.h> 
+#include <stdint.h>
 
 int main(int argc, char *argv[]) {
 	
@@ -111,7 +113,8 @@ void distribution(arguments_struct* args){
 
 	//iteramos  la data de image_data en intervalos de tamaño k
 	for(int i=0; i<(int)image_data->biSize; i+=k){
-		unsigned int * segment = malloc(k);
+		printf("------ iteration %d ------\n",i);
+		uint8_t * segment = malloc(sizeof(uint8_t) * k);
 
 		//printf("segment %d: ", i);
 		for(int m=0; m<k; m++){
@@ -121,7 +124,7 @@ void distribution(arguments_struct* args){
 		//printf("\n");
 
 		//iteramos cada imagen a ocultar y actualizamos el valor del cuadrado correspondiente.
-		int * valuesOfX = malloc(host_image_count * sizeof(int));
+		uint8_t * valuesOfX = malloc(host_image_count * sizeof(uint8_t));
 
 		for(int h=0; h<host_image_count; h++){
 			valuesOfX[h] = -1;
@@ -134,38 +137,50 @@ void distribution(arguments_struct* args){
 			int blocksPerLine = imageWidth/2;
 			int pointer = (g%blocksPerLine)*2+(2*imageWidth)*(g/blocksPerLine);
 
-			unsigned int x = host_images[j]->bitmapImage[pointer];
-			// while(valueIsPrecent(valuesOfX, x)){
-			// 	if(x<255){
-			// 		x++;
-			// 	}else{
-			// 		x=0;
-			// 	}
-			// }
-			unsigned int w = host_images[j]->bitmapImage[pointer+1];
-			unsigned int u = host_images[j]->bitmapImage[pointer+imageWidth];
-			unsigned int v = host_images[j]->bitmapImage[pointer+imageWidth+1];
+			uint8_t x = host_images[j]->bitmapImage[pointer];
+			while(valueIsPresent(valuesOfX, j, x)){
+				if(x<255){
+					x++;
+				}else{
+					x=0;
+				}
+			}
+			valuesOfX[j] = x;
+			uint8_t w = host_images[j]->bitmapImage[pointer+1];
+			uint8_t v = host_images[j]->bitmapImage[pointer+imageWidth];
+			uint8_t u = host_images[j]->bitmapImage[pointer+imageWidth+1];
 
 			//printf("square %d values are: [%d,%d,%d,%d]\n", g, x, w, u, v);
 
-			// tarea scott
-			// unsigned int y = evaluatePolinomial(x, segment);
-			// unsigned int * newValues = malloc(3*sizeof(unsigned int));
-			// newValues = calculateOfuscatedValues(w,u,v,y);
-			// host_images[j]->bitmapImage[pointer+1] = newValues[0];
-			// host_images[j]->bitmapImage[pointer+imageWidth] = newValues[1];
-			// host_images[j]->bitmapImage[pointeri+imageWidth+1] = newValues[2];
-			// free(newValues);
+			uint8_t y = evaluatePolinomial(x, segment,k);
+			
+			uint8_t * newValues = calculateOfuscatedValues(w,v,u,y);
+			host_images[j]->bitmapImage[pointer] = x;
+			host_images[j]->bitmapImage[pointer+1] = newValues[0];
+			host_images[j]->bitmapImage[pointer+imageWidth] = newValues[1];
+			host_images[j]->bitmapImage[pointer+imageWidth+1] = newValues[2];
+			free(newValues);
 
 		}
 		free(valuesOfX);
 		free(segment);
 	}
-	//updateamos todas las imagenes con la data cambiada.
-
+	// updateamos todas las imagenes con la data cambiada.
+	for(int i = 0; i < host_image_count; i++){
+		updateImageData(host_image_paths[i], host_images[i]);
+	}
 }
 
 void recompilation(arguments_struct* args){
 	printf("starting recompilation\n");
 	analizeImage(args->secretImage);
+}
+
+int valueIsPresent(uint8_t * valuesOfX, int valuesOfXSize, uint8_t x){
+	for(int i = 0 ; i < valuesOfXSize ; i++){
+		if(x == valuesOfX[i]){
+			return 1;
+		}
+	}
+	return 0;
 }
