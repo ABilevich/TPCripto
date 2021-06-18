@@ -1,13 +1,12 @@
 #include "include/galois_8.h"
 #include <stdio.h>
+#define MAX_BIT_REP 255
 
 int pol_gen = 355;  // 1 0110 0011 --> x^8 + x^6 + x^5 + x + 1
 int grado_pol_gen = 8;
 
 int pol_gen_2 = 7; // 0111 --> x^2 + x + 1
 
-uint16_t sum(uint8_t s1, uint8_t s2);
-uint8_t mult(uint8_t s1, uint8_t s2); 
 
 // int main(){
 //     uint8_t a = 84;  // 0101 0100
