@@ -3,8 +3,8 @@ CC=gcc
 
 all: main test
 
-main: src/main.o src/images.o src/galois_8.o
-	$(CC) src/main.c src/images.c src/galois_8.c $(CFLAGS) -o main
+main: src/main.o src/images.o src/galois_8.o src/interpolation.o
+	$(CC) src/main.c src/images.c src/galois_8.c src/interpolation.c $(CFLAGS) -o main
 
 test: 
 	cd tests; make all;

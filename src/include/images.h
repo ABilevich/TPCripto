@@ -9,11 +9,16 @@ typedef struct IMAGEDATA
     uint32_t    biHeight;        // The height of the image (22-25 bytes)
     uint32_t    biSize;
     uint32_t   bfOffBits;
+    // BITMAPFILEHEADER fileHeader;
+    // BITMAPINFOHEADER infoHeader;
 } IMAGEDATA;
 
 IMAGEDATA* analizeImage(char *path);
 
 int updateImageData(char *path, IMAGEDATA * imageData);
+uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u);
 uint8_t * calculateOfuscatedValues( uint8_t w,  uint8_t v, uint8_t u, uint8_t y );
+int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage);
+int copyImage(char * source_file, char * target_file);
 
 #endif

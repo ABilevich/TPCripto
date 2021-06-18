@@ -58,7 +58,7 @@ void showBmpInfoHead(BITMAPINFOHEADER pBmpinfoHead)
 
 IMAGEDATA * analizeImage(char *path){
 
-	printf("path is %s\n", path);
+	//printf("path is %s\n", path);
 
     uint8_t *bitmapImage;  //store image data
     // int imageIdx=0;  //image index counter
@@ -118,7 +118,8 @@ IMAGEDATA * analizeImage(char *path){
     imageData->biHeight = infoHeader.biHeight;
     imageData->biSize = infoHeader.biWidth * infoHeader.biHeight;
     imageData->bfOffBits = fileHeader.bfOffBits;
-    
+    // imageData->fileHeader = fileHeader;
+    // imageData->infoHeader = infoHeader;
 //////////////////////////////////////////
 
 	// for(int i =0; i< (int) (imageData->biSize); i++){
@@ -141,7 +142,6 @@ IMAGEDATA * analizeImage(char *path){
     fclose(fp);
     return imageData; 
 }
-
 
 int updateImageData(char *path, IMAGEDATA * imageData){
     //TODO: hacer
@@ -175,4 +175,67 @@ uint8_t * calculateOfuscatedValues(uint8_t w, uint8_t v,  uint8_t u, uint8_t y )
     newValues[2] = (u & 248) ^ aux;
     // printf("u was: %u, now is %u, with aux: %u, last 3 bits were: %u\n",u,newValues[2],aux, (u & 7));
     return newValues;
+}
+
+uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u){
+
+    uint8_t y = 0;
+    uint8_t mask = 7;
+    y = y ^ ((w & mask) << 5);
+    y = y ^ ((v & mask) << 2);
+    y = y ^ (u&3);
+
+    return y;
+}
+
+int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
+    //printf("createImage\n");
+    //TODO: hacer
+    //copyImage(inputPath, outputPath);
+
+    // FILE* fp;    
+    // fp = fopen(outputPath, "rb+");//Read the image.bmp file in the same directory.
+   
+    // // uint8_t asd[2] = {105,105};
+    IMAGEDATA * imageData = analizeImage(inputPath);
+    imageData->bitmapImage = bitmapImage;
+    // fseek(fp, imageData->bfOffBits, SEEK_SET);
+    // // fwrite(asd, 1, 2, fp);
+    // fwrite(bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
+    // //close file 
+    // fclose(fp);
+
+    updateImageData(outputPath, imageData);
+
+    
+    return 0;
+}
+
+int copyImage(char * source_file, char * target_file){
+   //printf("copyImage\n");
+
+   FILE *source, *target;
+ 
+   source = fopen(source_file, "r");
+ 
+   if( source == NULL )
+   {
+      exit(EXIT_FAILURE);
+   }
+ 
+   target = fopen(target_file, "w");
+ 
+   if( target == NULL )
+   {
+      fclose(source);
+      exit(EXIT_FAILURE);
+   }
+    uint16_t ch;
+   while( (  ch = fgetc(source) ) > 255 )
+      fputc(ch, target);
+ 
+   fclose(source);
+   fclose(target);
+ 
+   return 0;
 }

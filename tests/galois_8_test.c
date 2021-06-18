@@ -10,7 +10,7 @@ START_TEST (test_galois_sum) {
     uint8_t b = 13;  // 0000 1101
     
     uint8_t expected = 89;
-    ck_assert_uint_eq(expected, sum(a,b));
+    ck_assert_uint_eq(expected, g_sum(a,b));
 }
 END_TEST
 
@@ -19,7 +19,7 @@ START_TEST (test_galois_mult) {
     uint8_t b = 13;  // 0000 1101
 
     uint8_t expected = 1;
-    ck_assert_uint_eq(expected, mult(a,b));
+    ck_assert_uint_eq(expected, g_mult(a,b));
 }
 END_TEST
 
@@ -27,7 +27,7 @@ START_TEST (test_galois_pol) {
     uint8_t coefs[4] = {1, 6, 0, 3};
 
     uint8_t expected = 26;
-    ck_assert_uint_eq(expected, evaluatePolinomial(3,coefs,4));
+    ck_assert_uint_eq(expected, g_evaluatePolinomial(3,coefs,4));
 }
 END_TEST
 
