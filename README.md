@@ -20,7 +20,7 @@ En la carpeta del proyecto ejecutar:
 ```bash
 $> make all
 ```
-En caso de no tener la libreria `check` de unit testing ejecutar:
+En caso de no tener la libreria `Check` de unit testing ejecutar:
 ```bash
 $> make main
 ```
