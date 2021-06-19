@@ -11,7 +11,7 @@ import numpy as np
 #         s += ', '
 # s += '};'
 
-# print(s)
+
 
 GF = galois.GF(2**8, irreducible_poly=galois.Poly.Degrees([8, 6, 5, 1, 0]))
 

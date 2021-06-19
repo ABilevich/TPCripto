@@ -58,11 +58,9 @@ void showBmpInfoHead(BITMAPINFOHEADER pBmpinfoHead)
 
 IMAGEDATA * analizeImage(char *path, int flip){
 
-	//printf("path is %s\n", path);
 
     uint8_t *bitmapImage;  //store image data
-    // int imageIdx=0;  //image index counter
-    // unsigned char tempRGB;  //our swap variable
+
 
     BITMAPFILEHEADER fileHeader;
     BITMAPINFOHEADER infoHeader;
@@ -78,13 +76,9 @@ IMAGEDATA * analizeImage(char *path, int flip){
     fread(&fileType,1,sizeof (uint16_t), fp);  
     if (fileType == 0x4d42)   
     {   
-        //printf("The file type identification is correct!" );  
-       // printf("\nFile identifier: %d\n", fileType); 
+
         fread(&fileHeader, 1, sizeof(BITMAPFILEHEADER), fp);
-        //showBmpHead(fileHeader);
         fread(&infoHeader, 1, sizeof(BITMAPINFOHEADER), fp);
-        //showBmpInfoHead(infoHeader);
-        // fclose(fp);        
     }
 
     //move file point to the beginning of bitmap data
@@ -151,7 +145,6 @@ IMAGEDATA * analizeImage(char *path, int flip){
 }
 
 uint8_t * invertImage(uint8_t *bitmapImage, uint32_t width, uint32_t heigth){
-    printf("dadavueltacion\n");
     uint8_t * bitmapImageInverted = (uint8_t*) malloc(width * heigth);
 
     int total = width*heigth;
@@ -210,21 +203,11 @@ uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u){
 }
 
 int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
-    //printf("createImage\n");
-    //TODO: hacer
-    //copyImage(inputPath, outputPath);
 
-    // FILE* fp;    
-    // fp = fopen(outputPath, "rb+");//Read the image.bmp file in the same directory.
-   
-    // // uint8_t asd[2] = {105,105};
+    copyImage(inputPath, outputPath);
+
     IMAGEDATA * imageData = analizeImage(inputPath, 0);
     imageData->bitmapImage = bitmapImage;
-    // fseek(fp, imageData->bfOffBits, SEEK_SET);
-    // // fwrite(asd, 1, 2, fp);
-    // fwrite(bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
-    // //close file 
-    // fclose(fp);
 
     updateImageData(outputPath, imageData, 0);
 
@@ -233,7 +216,6 @@ int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
 }
 
 int copyImage(char * source_file, char * target_file){
-   //printf("copyImage\n");
 
    FILE *source, *target;
  
@@ -251,8 +233,9 @@ int copyImage(char * source_file, char * target_file){
       fclose(source);
       exit(EXIT_FAILURE);
    }
-    uint16_t ch;
-   while( (  ch = fgetc(source) ) > 255 )
+
+    char ch;
+   while( (  ch = fgetc(source) ) != EOF )
       fputc(ch, target);
  
    fclose(source);
