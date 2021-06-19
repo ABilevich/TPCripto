@@ -17,7 +17,9 @@ int main(int argc, char *argv[]) {
 	}else{
 		recompilation(args);
 	}
-
+	for(int i = 0 ; i < args->n; i++){
+		free(args->images[i]);
+	}
 	free(args);
 	return 0;
 }
@@ -70,7 +72,8 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 					args->images[fileCounter] = malloc(strlen(args->directorio) + strlen(dir->d_name) + 1);
 					strcpy(args->images[fileCounter], args->directorio);
 					strcat(args->images[fileCounter],dir->d_name);
-					args->images[fileCounter][strlen(args->directorio) + strlen(dir->d_name) + 1] = '\0';
+					args->images[fileCounter][strlen(args->directorio) + strlen(dir->d_name)] = '\0';
+					// printf("total size: %d, actual len: %d\n",strlen(args->directorio) + strlen(dir->d_name) + 1,strlen(args->images[fileCounter]));
 					fileCounter++;
 				}
 			}
@@ -78,6 +81,9 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 	}
 	closedir(d);
 	args->n = fileCounter;
+	for(int i = 0 ; i < fileCounter; i++){
+		printf("file: %s\n", args->images[i]);
+	}
 	if(args->n < args->k){
 		fprintf(stderr, "There must be at least k images.\n");
 		exit(1);
@@ -155,6 +161,16 @@ void distribution(arguments_struct* args){
 	for(int i = 0; i < host_image_count; i++){
 		updateImageData(host_image_paths[i], host_images[i], 1);
 	}
+
+	// Liberamos la memoria utilizada
+	for(int n=0; n<host_image_count; n+=1){
+		free(host_images[n]->bitmapImage);
+		free(host_images[n]);
+	}
+	free(host_images);
+	free(image_data->bitmapImage);
+	free(image_data);
+	
 }
 
 void recompilation(arguments_struct* args){
@@ -211,9 +227,17 @@ void recompilation(arguments_struct* args){
 		free(segment);
 	}
 	
-	createImage(args->images[0], args->secretImage, bitmapImage);
-	free(bitmapImage);
+	createImage(args->images[0],host_images[0], args->secretImage, bitmapImage);
 	
+
+	// Liberamos la memoria utilizada
+	free(bitmapImage);
+	for(int n=0; n<host_image_count; n+=1){
+		printf("n: %d\n",n);
+		free(host_images[n]->bitmapImage);
+		free(host_images[n]);
+	}
+	free(host_images);
 }
 
 int valueIsPresent(uint8_t * valuesOfX, int valuesOfXSize, uint8_t x){

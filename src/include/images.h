@@ -18,8 +18,7 @@ IMAGEDATA * analizeImage(char *path, int flip);
 int updateImageData(char *path, IMAGEDATA * imageData, int flip);
 uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u);
 uint8_t * calculateOfuscatedValues( uint8_t w,  uint8_t v, uint8_t u, uint8_t y );
-int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage);
-int copyImage(char * source_file, char * target_file);
+int createImage(char * inputPath, IMAGEDATA * input_image_data, char * outputPath ,uint8_t* bitmapImage);
 uint8_t * invertImage(uint8_t *bitmapImage, uint32_t width, uint32_t heigth);
 
 #endif

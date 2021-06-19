@@ -1,5 +1,8 @@
-CFLAGS= -Wall -Wextra -pedantic -pedantic-errors -O3 -std=gnu99 -Wno-unused-parameter -Wno-unused-result -Wno-unused-variable 
+CFLAGS= -Wall -Wextra -pedantic -pedantic-errors -O3 -std=gnu99 -Wno-unused-result
 CC=gcc
+
+debug: CFLAGS += -g -fsanitize=address
+debug: main
 
 all: main test
 

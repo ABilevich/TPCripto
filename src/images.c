@@ -169,6 +169,9 @@ int updateImageData(char *path, IMAGEDATA * imageData, int flip){
     fseek(fp, imageData->bfOffBits, SEEK_SET);
     fwrite(bitmapImageInverted, 1, imageData->biWidth * imageData->biHeight, fp);
     fclose(fp);
+    if(flip){
+        free(bitmapImageInverted);
+    }
     return 0;
 }
 
@@ -202,44 +205,33 @@ uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u){
     return y;
 }
 
-int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
+int createImage(char * inputPath, IMAGEDATA * input_image_data, char * outputPath ,uint8_t* bitmapImage){
+    uint8_t header[input_image_data->bfOffBits];
+    FILE* fp_read;    
+    fp_read = fopen(inputPath, "rb");//Read the image.bmp file in the same directory.
+    fread(header, 1, input_image_data->bfOffBits, fp_read);
+    FILE* fp_write;    
+    fp_write = fopen(outputPath, "wb");//Read the image.bmp file in the same directory.
+    fwrite(header, 1,input_image_data->bfOffBits,fp_write);
 
-    copyImage(inputPath, outputPath);
-
-    IMAGEDATA * imageData = analizeImage(inputPath, 0);
-    imageData->bitmapImage = bitmapImage;
-
-    updateImageData(outputPath, imageData, 0);
+    // // uint8_t asd[2] = {105,105};
+    // IMAGEDATA * imageData = analizeImage(inputPath, 0);
+    IMAGEDATA image_data = {
+        bitmapImage,
+        input_image_data->biWidth,         
+        input_image_data->biHeight,       
+        input_image_data->biSize,
+        input_image_data->bfOffBits
+    };
+    // input_image_data->bitmapImage = bitmapImage;
+    // fseek(fp, imageData->bfOffBits, SEEK_SET);
+    // // fwrite(asd, 1, 2, fp);
+    // fwrite(bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
+    // //close file 
+    fclose(fp_read);
+    fclose(fp_write);
+    updateImageData(outputPath, &image_data, 0);
 
     
     return 0;
-}
-
-int copyImage(char * source_file, char * target_file){
-
-   FILE *source, *target;
- 
-   source = fopen(source_file, "r");
- 
-   if( source == NULL )
-   {
-      exit(EXIT_FAILURE);
-   }
- 
-   target = fopen(target_file, "w");
- 
-   if( target == NULL )
-   {
-      fclose(source);
-      exit(EXIT_FAILURE);
-   }
-
-    char ch;
-   while( (  ch = fgetc(source) ) != EOF )
-      fputc(ch, target);
- 
-   fclose(source);
-   fclose(target);
- 
-   return 0;
 }

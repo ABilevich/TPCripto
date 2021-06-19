@@ -312,7 +312,6 @@ uint8_t g_mult_alt(uint8_t s1, uint8_t s2){
 
     
     // Reducimos Counter con int pol_gen = 355;  // 1 0110 0011 --> x^8 + x^6 + x^5 + x + 1
-    int keep_going = 1;
     uint16_t shifted_m;
     int i;
     int diff;
