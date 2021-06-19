@@ -71,26 +71,28 @@ void lagrange_interpolation(uint8_t * oc_x, uint8_t * oc_y, int size, uint8_t * 
             L0[i] = prod;
         }
         //printf("7\n");
+        int acumEmpty = 1;
         uint8_t acum = 0;
         for(int i=j; i<size; i++){
             uint8_t aux = g_mult(L0[i], y[i]);
-            if(acum == 0){
+            if(acumEmpty){
                 acum = aux;
+                acumEmpty = 0;
             }else{
                 acum = g_sum(acum, aux);
             }
         }
         coefs[j] = acum;
         //printf("8\n");
-        if(j<size-1){
-            for(int i=j+1; i<size; i++){
-                //printf("9\n");
-                uint8_t upper = g_sub(y[i], coefs[j]);
-                uint8_t bot = x[i];
-                uint8_t aux = g_div(upper, bot);
-                y[i] = aux;
-            }
+        
+        for(int i=j+1; i<size; i++){
+            //printf("9\n");
+            uint8_t upper = g_sub(y[i], coefs[j]);
+            uint8_t bot = x[i];
+            uint8_t aux = g_div(upper, bot);
+            y[i] = aux;
         }
+        
     }
     //printf("10\n");
     coefs[size-1] = y[size-1];

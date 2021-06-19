@@ -13,9 +13,9 @@ typedef struct IMAGEDATA
     // BITMAPINFOHEADER infoHeader;
 } IMAGEDATA;
 
-IMAGEDATA* analizeImage(char *path);
+IMAGEDATA * analizeImage(char *path, int flip);
 
-int updateImageData(char *path, IMAGEDATA * imageData);
+int updateImageData(char *path, IMAGEDATA * imageData, int flip);
 uint8_t reconstructY(uint8_t w, uint8_t v,  uint8_t u);
 uint8_t * calculateOfuscatedValues( uint8_t w,  uint8_t v, uint8_t u, uint8_t y );
 int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage);

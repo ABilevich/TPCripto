@@ -56,7 +56,7 @@ void showBmpInfoHead(BITMAPINFOHEADER pBmpinfoHead)
    printf("Number of important colors: %d\n" ,pBmpinfoHead.biClrImportant);   
 }
 
-IMAGEDATA * analizeImage(char *path){
+IMAGEDATA * analizeImage(char *path, int flip){
 
 	//printf("path is %s\n", path);
 
@@ -113,10 +113,14 @@ IMAGEDATA * analizeImage(char *path){
         return NULL;
     }
 
-    uint8_t * bitmapImageInverted = invertImage(bitmapImage, infoHeader.biWidth, infoHeader.biHeight);
-
-    free(bitmapImage);
-    imageData->bitmapImage = bitmapImageInverted;
+    if(flip){
+        uint8_t * bitmapImageInverted = invertImage(bitmapImage, infoHeader.biWidth, infoHeader.biHeight);
+        free(bitmapImage);
+        imageData->bitmapImage = bitmapImageInverted;
+    }else{
+        imageData->bitmapImage = bitmapImage;
+    }
+    
     imageData->biWidth = infoHeader.biWidth;
     imageData->biHeight = infoHeader.biHeight;
     imageData->biSize = infoHeader.biWidth * infoHeader.biHeight;
@@ -147,6 +151,7 @@ IMAGEDATA * analizeImage(char *path){
 }
 
 uint8_t * invertImage(uint8_t *bitmapImage, uint32_t width, uint32_t heigth){
+    printf("dadavueltacion\n");
     uint8_t * bitmapImageInverted = (uint8_t*) malloc(width * heigth);
 
     int total = width*heigth;
@@ -159,8 +164,13 @@ uint8_t * invertImage(uint8_t *bitmapImage, uint32_t width, uint32_t heigth){
     return bitmapImageInverted;
 }
 
-int updateImageData(char *path, IMAGEDATA * imageData){
-    uint8_t * bitmapImageInverted = invertImage(imageData->bitmapImage, imageData->biWidth, imageData->biHeight);
+int updateImageData(char *path, IMAGEDATA * imageData, int flip){
+    uint8_t * bitmapImageInverted;
+    if(flip){
+        bitmapImageInverted = invertImage(imageData->bitmapImage, imageData->biWidth, imageData->biHeight);
+    }else{
+        bitmapImageInverted = imageData->bitmapImage;
+    }
     FILE* fp;
     fp = fopen(path, "rb+");
     fseek(fp, imageData->bfOffBits, SEEK_SET);
@@ -208,7 +218,7 @@ int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
     // fp = fopen(outputPath, "rb+");//Read the image.bmp file in the same directory.
    
     // // uint8_t asd[2] = {105,105};
-    IMAGEDATA * imageData = analizeImage(inputPath);
+    IMAGEDATA * imageData = analizeImage(inputPath, 0);
     imageData->bitmapImage = bitmapImage;
     // fseek(fp, imageData->bfOffBits, SEEK_SET);
     // // fwrite(asd, 1, 2, fp);
@@ -216,7 +226,7 @@ int createImage(char * inputPath, char * outputPath ,uint8_t* bitmapImage){
     // //close file 
     // fclose(fp);
 
-    updateImageData(outputPath, imageData);
+    updateImageData(outputPath, imageData, 0);
 
     
     return 0;

@@ -99,7 +99,7 @@ void distribution(arguments_struct* args){
 	int k = args->k;
 
 	//llamamos a anlaize image para la imagens que uqeremos ocultar
-	IMAGEDATA * image_data = analizeImage(args->secretImage);
+	IMAGEDATA * image_data = analizeImage(args->secretImage, 0);
 	// for( int i = 0; i < (int)image_data->biSize; i+=1){
 	// 	printf("%d\n", image_data->bitmapImage[i]);
 	// }
@@ -118,7 +118,7 @@ void distribution(arguments_struct* args){
 	// llamamos analize image para todas las imagenes donde se va a ocultar el mensaje
 	for(int n=0; n<host_image_count; n+=1){
 		//printf("----------------------host Image %d Info:\n", n);
-		host_images[n] = analizeImage(host_image_paths[n]);
+		host_images[n] = analizeImage(host_image_paths[n], 1);
 	}
 
 	//iteramos  la data de image_data en intervalos de tamaño k
@@ -153,7 +153,6 @@ void distribution(arguments_struct* args){
 				}else{
 					x=245;
 				}
-				printf("changed x to: %d\n",x);
 			}
 			valuesOfX[j] = x;
 			uint8_t w = host_images[j]->bitmapImage[pointer+1];
@@ -170,15 +169,11 @@ void distribution(arguments_struct* args){
 			host_images[j]->bitmapImage[pointer+imageWidth] = newValues[1];
 			host_images[j]->bitmapImage[pointer+imageWidth+1] = newValues[2];
 
-			uint8_t new_y = reconstructY(newValues[0],newValues[1],newValues[2]);
+			//uint8_t new_y = reconstructY(newValues[0],newValues[1],newValues[2]);
 			// if(i+j<20){
 			// 	printf("value number %d: (%d,%d): {%d} [w: %d / v: %d / u:%d]\n", i+j, x, y, new_y, newValues[0], newValues[1], newValues[2]);
 			// }
-			
-
 			free(newValues);
-
-
 		}
 
 		// if(i<k*3){
@@ -191,7 +186,7 @@ void distribution(arguments_struct* args){
 	}
 	// updateamos todas las imagenes con la data cambiada.
 	for(int i = 0; i < host_image_count; i++){
-		updateImageData(host_image_paths[i], host_images[i]);
+		updateImageData(host_image_paths[i], host_images[i], 1);
 	}
 }
 
@@ -205,18 +200,13 @@ void recompilation(arguments_struct* args){
 	int host_image_count = args->n;
 	//printf("---------------------host Image Count: %d\n", host_image_count);
 	
-	if(host_image_count < k){
-		fprintf(stderr,"Not enough Images to reconstruct original image\n");
-		exit(1);
-	}
-	
 	//alocar espacio para el array la data de imagenes portadoras del secreto
 	IMAGEDATA ** host_images = malloc(sizeof(IMAGEDATA) * host_image_count);
 
 	// llamamos analize image para todas las imagenes donde se va a ocultar el mensaje
 	for(int n=0; n<host_image_count; n+=1){
 		//printf("----------------------host Image %d Info:\n", n);
-		host_images[n] = analizeImage(host_image_paths[n]);
+		host_images[n] = analizeImage(host_image_paths[n], 1);
 	}
 
 	int image_size = (int)host_images[0]->biSize;
@@ -253,7 +243,7 @@ void recompilation(arguments_struct* args){
 			// }
 		}
 		//printf("------ la lagrangiananashex ------\n");
-		lagrange_interpolation(point_x, point_y, host_image_count, segment);
+		lagrange_interpolation(point_x, point_y, k, segment);
 		//printf("finiquitada\n");
 
 		for(int h=0;h<k;h++){
@@ -280,6 +270,7 @@ void recompilation(arguments_struct* args){
 	// for( int i = 0; i < image_size; i+=1){
 	// 		printf("%d\n", bitmapImage[i]);
 	// }
+
 
 	createImage(args->images[0], args->secretImage, bitmapImage);
 	free(bitmapImage);
