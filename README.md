@@ -9,10 +9,20 @@ Integrantes:
 
 Implementación de secreto compartido con esteganografía hecho en C para esconder una imagen de formato `.bmp` dentro de otras imágenes del mismo formato de forma tal que pueda ser recuperarla. Esta implementación está basada en el algoritmo de Imagen Secreta Compartida descripto en el documento `Sistema de Imagen Secreta Compartida con Optimización de la Carga Útil.pdf` que se encuentra en el repositorio. 
 
+# Requerimientos
+Libreria para hacer unit testing en C: `Check`
+```bash
+$> sudo apt install check
+```
+
 # Compilación
 En la carpeta del proyecto ejecutar:
 ```bash
 $> make all
+```
+En caso de no tener la libreria `check` de unit testing ejecutar:
+```bash
+$> make main
 ```
 Esto creará el ejecutable `main`
 # Ejecución
