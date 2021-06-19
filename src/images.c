@@ -113,16 +113,7 @@ IMAGEDATA * analizeImage(char *path){
         return NULL;
     }
 
-    uint8_t * bitmapImageInverted = (uint8_t*) malloc(infoHeader.biWidth * infoHeader.biHeight);
-
-    int width = infoHeader.biWidth;
-    int heigth = infoHeader.biHeight;
-    int total = width*heigth;
-    for(int i=0; i<width; i++){
-        for(int j=0; j<heigth; j++){
-            bitmapImageInverted[i*width+j] = bitmapImage[total-width*(i+1) + j];
-        }
-    }
+    uint8_t * bitmapImageInverted = invertImage(bitmapImage, infoHeader.biWidth, infoHeader.biHeight);
 
     free(bitmapImage);
     imageData->bitmapImage = bitmapImageInverted;
@@ -155,11 +146,25 @@ IMAGEDATA * analizeImage(char *path){
     return imageData; 
 }
 
+uint8_t * invertImage(uint8_t *bitmapImage, uint32_t width, uint32_t heigth){
+    uint8_t * bitmapImageInverted = (uint8_t*) malloc(width * heigth);
+
+    int total = width*heigth;
+    for(uint32_t i=0; i<width; i++){
+        for(uint32_t j=0; j<heigth; j++){
+            bitmapImageInverted[i*width+j] = bitmapImage[total-width*(i+1) + j];
+        }
+    }
+
+    return bitmapImageInverted;
+}
+
 int updateImageData(char *path, IMAGEDATA * imageData){
+    uint8_t * bitmapImageInverted = invertImage(imageData->bitmapImage, imageData->biWidth, imageData->biHeight);
     FILE* fp;
     fp = fopen(path, "rb+");
     fseek(fp, imageData->bfOffBits, SEEK_SET);
-    fwrite(imageData->bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
+    fwrite(bitmapImageInverted, 1, imageData->biWidth * imageData->biHeight, fp);
     fclose(fp);
     return 0;
 }
