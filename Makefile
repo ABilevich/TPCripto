@@ -15,4 +15,4 @@ test:
 .PHONY: clean
 
 clean:
-	 rm src/*.o main; cd tests;make clean
+	 rm src/*.o main; cd tests; make clean
