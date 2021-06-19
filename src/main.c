@@ -81,9 +81,7 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 	}
 	closedir(d);
 	args->n = fileCounter;
-	for(int i = 0 ; i < fileCounter; i++){
-		printf("file: %s\n", args->images[i]);
-	}
+	
 	if(args->n < args->k){
 		fprintf(stderr, "There must be at least k images.\n");
 		exit(1);
