@@ -231,7 +231,6 @@ void recompilation(arguments_struct* args){
 	// Liberamos la memoria utilizada
 	free(bitmapImage);
 	for(int n=0; n<host_image_count; n+=1){
-		printf("n: %d\n",n);
 		free(host_images[n]->bitmapImage);
 		free(host_images[n]);
 	}
