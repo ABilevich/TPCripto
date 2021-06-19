@@ -29,8 +29,11 @@ Para distribuir el secreto:
 ```bash
 $> main d images/Albert.bmp 4 shades/
 ```
+Donde `images/Albert.bmp` es la imagen que se quiere esconder y `shades/` es la carpeta en la que se encuentran las imágenes en las que se distribuirá el secreto.
 
 Para recuperar el secreto:
 ```bash
 $> main d output/secret.bmp 4 shades/
 ```
+Donde `output/secret.bmp` es la imagen secreta y `shades/` es la carpeta en la que se encuentran las imágenes en las que se distribuyó el secreto.
+
