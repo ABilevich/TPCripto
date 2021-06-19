@@ -2,6 +2,7 @@
 #include "include/galois_8.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 // values es una matriz donde cada elemento es de la forma [x,y] --> [[1,2],[2,3],[4,5]]
 // amount tiene la cantidad de pares [x,y] dentro de values
 // uint8_t * gauss_interpolation(uint8_t** values,uint8_t amount){
@@ -96,4 +97,106 @@ void lagrange_interpolation(uint8_t * oc_x, uint8_t * oc_y, int size, uint8_t * 
     }
     //printf("10\n");
     coefs[size-1] = y[size-1];
+}
+
+
+int poly_interpolate(uint8_t * x, uint8_t * y, int k, uint8_t * poly) {
+
+    uint8_t upper;
+    uint8_t bottom;
+    uint8_t aux;
+
+    uint8_t L0[k];
+    uint8_t s[k];
+
+    memset((void *) L0, 0, k*sizeof(uint8_t));
+    memset((void *) s, 0, k*sizeof(uint8_t));
+
+    int acum_empty;
+    uint8_t acum;
+
+    uint8_t fixed_x[k];
+    memcpy(fixed_x, x, k*sizeof(x[0]));
+    uint8_t fixed_y[k];
+    memcpy(fixed_y, y, k*sizeof(y[0]));
+
+    uint8_t aux_x, aux_y;
+
+    for (int r = 0; r < k; r++) {
+        if (fixed_x[r] == 0) {
+            aux_x = fixed_x[0];
+            aux_y = fixed_y[0];
+
+            fixed_x[0] = fixed_x[r];
+            fixed_y[0] = fixed_y[r];
+
+            fixed_x[r] = aux_x;
+            fixed_y[r] = aux_y;
+
+            break;
+        }
+    }
+
+    for(int j=0; j<k-1; j++) {
+
+        // L(0)
+        for(int i =j; i < k; i++){
+            acum_empty = 1;
+            acum = 0;
+
+            for(int h = j; h < k; h++){
+                if (h != i) {
+                    upper = g_sub(0, fixed_x[h]);
+                    bottom = g_sub(fixed_x[i], fixed_x[h]);
+                    // if (bottom == 0) {
+                    //     fprintf(stderr, "DIVISION BY ZERO: %d - %d\n", x[i], x[h]);
+                    // }
+                    aux = g_div(upper, bottom);
+
+                    if (acum_empty) {
+                        acum_empty = 0;
+                        acum = aux;
+                    }
+                    else {
+                        acum = g_mult(acum, aux);
+                    }
+                }
+            }
+
+            L0[i] = acum;
+        }
+
+        acum_empty = 1;
+        acum = 0;
+        
+        for(int i=j; i<k; i++) {
+            aux = g_mult(L0[i], fixed_y[i]);
+
+            if (acum_empty) {
+                acum_empty = 0;
+                acum = aux;
+            }
+            else {
+                acum = g_sum(acum, aux);
+            }
+        }
+
+        s[j] = acum;
+
+        for(int i=j+1; i<k; i++) {
+            upper = g_sub(fixed_y[i], s[j]);
+            bottom = fixed_x[i];
+            // if (bottom == 0) {
+            //     fprintf(stderr, "DIVISION BY ZERO: %d\n", bottom);
+            // }
+            aux = g_div(upper, bottom);
+
+            fixed_y[i] = aux;
+        }
+    }
+    s[k-1] = fixed_y[k-1];
+
+    memcpy(poly, s, k * sizeof(poly[0]));
+
+    return 0;
 }

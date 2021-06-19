@@ -243,7 +243,7 @@ void recompilation(arguments_struct* args){
 			// }
 		}
 		//printf("------ la lagrangiananashex ------\n");
-		lagrange_interpolation(point_x, point_y, k, segment);
+		poly_interpolate(point_x, point_y, k, segment);
 		//printf("finiquitada\n");
 
 		for(int h=0;h<k;h++){
