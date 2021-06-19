@@ -78,12 +78,12 @@ IMAGEDATA * analizeImage(char *path){
     fread(&fileType,1,sizeof (uint16_t), fp);  
     if (fileType == 0x4d42)   
     {   
-        printf("The file type identification is correct!" );  
-        printf("\nFile identifier: %d\n", fileType); 
+        //printf("The file type identification is correct!" );  
+       // printf("\nFile identifier: %d\n", fileType); 
         fread(&fileHeader, 1, sizeof(BITMAPFILEHEADER), fp);
-        showBmpHead(fileHeader);
+        //showBmpHead(fileHeader);
         fread(&infoHeader, 1, sizeof(BITMAPINFOHEADER), fp);
-        showBmpInfoHead(infoHeader);
+        //showBmpInfoHead(infoHeader);
         // fclose(fp);        
     }
 
@@ -113,7 +113,19 @@ IMAGEDATA * analizeImage(char *path){
         return NULL;
     }
 
-    imageData->bitmapImage = bitmapImage;
+    uint8_t * bitmapImageInverted = (uint8_t*) malloc(infoHeader.biWidth * infoHeader.biHeight);
+
+    int width = infoHeader.biWidth;
+    int heigth = infoHeader.biHeight;
+    int total = width*heigth;
+    for(int i=0; i<width; i++){
+        for(int j=0; j<heigth; j++){
+            bitmapImageInverted[i*width+j] = bitmapImage[total-width*(i+1) + j];
+        }
+    }
+
+    free(bitmapImage);
+    imageData->bitmapImage = bitmapImageInverted;
     imageData->biWidth = infoHeader.biWidth;
     imageData->biHeight = infoHeader.biHeight;
     imageData->biSize = infoHeader.biWidth * infoHeader.biHeight;
@@ -144,14 +156,10 @@ IMAGEDATA * analizeImage(char *path){
 }
 
 int updateImageData(char *path, IMAGEDATA * imageData){
-    //TODO: hacer
-    FILE* fp;    
-    fp = fopen(path, "rb+");//Read the image.bmp file in the same directory.
-    // uint8_t asd[2] = {105,105};
+    FILE* fp;
+    fp = fopen(path, "rb+");
     fseek(fp, imageData->bfOffBits, SEEK_SET);
-    // fwrite(asd, 1, 2, fp);
     fwrite(imageData->bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
-    //close file 
     fclose(fp);
     return 0;
 }
@@ -162,18 +170,16 @@ uint8_t * calculateOfuscatedValues(uint8_t w, uint8_t v,  uint8_t u, uint8_t y )
     for (uint8_t i = 0; i < 8;i++){
         parity = parity ^ ((y >> i) & 1);                                                          
     } 
-    // printf("y: %u, parity: %u\n",y,parity);
 
-    //para w
     uint8_t aux = (y >> 5) & 7;
     newValues[0] = (w & 248) ^ aux;
-    // printf("w was: %u, now is %u, with aux: %u, last 3 bits were: %u\n",w,newValues[0],aux,(w & 7));
+
     aux = (y >> 2) & 7;
     newValues[1] = (v & 248) ^ aux;
-    // printf("v was: %u, now is %u, with aux: %u, last 3 bits were: %u\n",v,newValues[1],aux,(v & 7));
+    
     aux = ((parity << 2) ^ (y & 3)) & 7;
     newValues[2] = (u & 248) ^ aux;
-    // printf("u was: %u, now is %u, with aux: %u, last 3 bits were: %u\n",u,newValues[2],aux, (u & 7));
+
     return newValues;
 }
 

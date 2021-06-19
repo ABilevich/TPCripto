@@ -85,8 +85,12 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 	}
 	closedir(d);
 	args->n = fileCounter;
-	
-	return args;	
+	if(args->n < args->k){
+		fprintf(stderr, "There must be at least k images.\n");
+		exit(1);
+	}
+
+	return args;
 }
 
 void distribution(arguments_struct* args){
@@ -96,15 +100,16 @@ void distribution(arguments_struct* args){
 
 	//llamamos a anlaize image para la imagens que uqeremos ocultar
 	IMAGEDATA * image_data = analizeImage(args->secretImage);
-	for( int i = 0; i < (int)image_data->biSize; i+=1){
-		printf("%d\n", image_data->bitmapImage[i]);
-	}
+	// for( int i = 0; i < (int)image_data->biSize; i+=1){
+	// 	printf("%d\n", image_data->bitmapImage[i]);
+	// }
 
 
 	
 	//conseguimos en base al nombre del directorio un array con todos los nombres de las imagenes portadoras
 	char ** host_image_paths = args->images;
 	int host_image_count = args->n;
+
 	//printf("---------------------host Image Count: %d\n", host_image_count);
 	
 	//alocar espacio para el array la data de imagenes portadoras del secreto
@@ -119,7 +124,7 @@ void distribution(arguments_struct* args){
 	//iteramos  la data de image_data en intervalos de tamaño k
 	for(int i=0; i<(int)image_data->biSize; i+=k){
 		//printf("------ iteration %d ------\n",i);
-		uint8_t * segment = malloc(sizeof(uint8_t) * k);
+		uint8_t segment[k];
 
 		//printf("segment %d: ", i);
 		for(int m=0; m<k; m++){
@@ -129,8 +134,7 @@ void distribution(arguments_struct* args){
 		//printf("\n");
 
 		//iteramos las host images y actualizamos el valor del cuadrado correspondiente.
-		uint8_t * valuesOfX = malloc(host_image_count * sizeof(uint8_t));
-
+		uint8_t valuesOfX[host_image_count];
 		for(int h=0; h<host_image_count; h++){
 			valuesOfX[h] = -1;
 		}
@@ -157,7 +161,7 @@ void distribution(arguments_struct* args){
 
 			//printf("square %d values are: [%d,%d,%d,%d]\n", g, x, w, u, v);
 
-			uint8_t y = g_evaluatePolinomial(x, segment,k);
+			uint8_t y = g_evaluatePolinomial(x, segment, k);
 			
 			uint8_t * newValues = calculateOfuscatedValues(w,v,u,y);
 			host_images[j]->bitmapImage[pointer] = x;
@@ -183,9 +187,6 @@ void distribution(arguments_struct* args){
 		// 	}
 		// 	printf("]\n");
 		// }
-
-		free(valuesOfX);
-		free(segment);
 	}
 	// updateamos todas las imagenes con la data cambiada.
 	for(int i = 0; i < host_image_count; i++){
@@ -275,9 +276,9 @@ void recompilation(arguments_struct* args){
 		//printf("------ end iteration %d ------\n",i);
 	}
 	
-	for( int i = 0; i < image_size; i+=1){
-			printf("%d\n", bitmapImage[i]);
-	}
+	// for( int i = 0; i < image_size; i+=1){
+	// 		printf("%d\n", bitmapImage[i]);
+	// }
 
 	createImage(args->images[0], args->secretImage, bitmapImage);
 	free(bitmapImage);
