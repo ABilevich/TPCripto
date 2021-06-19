@@ -153,6 +153,7 @@ void distribution(arguments_struct* args){
 				}else{
 					x=245;
 				}
+				printf("changed x to: %d\n",x);
 			}
 			valuesOfX[j] = x;
 			uint8_t w = host_images[j]->bitmapImage[pointer+1];
