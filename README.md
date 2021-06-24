@@ -24,7 +24,8 @@ En caso de no tener la libreria `Check` de unit testing ejecutar:
 ```bash
 $> make main
 ```
-Esto creará el ejecutable `main`
+Esto creará el ejecutable `main` y los ejecutables de testeos dentro de la carpeta `tests`.
+
 # Ejecución
 El programa debe ser ejecutado con los siguientes argumentos:
 - `d` o `r`: 
@@ -47,3 +48,5 @@ $> ./main d output/secret.bmp 4 shades/
 ```
 Donde `output/secret.bmp` es la imagen secreta y `shades/` es la carpeta en la que se encuentran las imágenes en las que se distribuyó el secreto.
 
+# Testeos
+Dentro de la carpeta de `tests` se encuentran los archivos de testeo, al compilarlos se crean los ejecutables con la forma `nombre_del_archivo.out`.
