@@ -170,8 +170,11 @@ int createImage(char * inputPath, IMAGEDATA * input_image_data, char * outputPat
     fread(header, 1, input_image_data->bfOffBits, fp_read);
     FILE* fp_write;    
     fp_write = fopen(outputPath, "wb");//Read the image.bmp file in the same directory.
+    if(!fp_write){
+        fprintf(stderr,"El directorio no existe\n");
+        exit(EXIT_FAILURE);
+    }
     fwrite(header, 1,input_image_data->bfOffBits,fp_write);
-
     IMAGEDATA image_data = {
         bitmapImage,
         input_image_data->biWidth,         
