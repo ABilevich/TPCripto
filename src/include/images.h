@@ -9,8 +9,6 @@ typedef struct IMAGEDATA
     uint32_t    biHeight;        // The height of the image (22-25 bytes)
     uint32_t    biSize;
     uint32_t   bfOffBits;
-    // BITMAPFILEHEADER fileHeader;
-    // BITMAPINFOHEADER infoHeader;
 } IMAGEDATA;
 
 IMAGEDATA * analizeImage(char *path, int flip);

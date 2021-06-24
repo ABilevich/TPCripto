@@ -8,6 +8,7 @@
 #include <dirent.h> 
 #include <stdint.h>
 
+static void showHow();
 int main(int argc, char *argv[]) {
 	
 	arguments_struct * args = checkArguments(argc,argv);
@@ -29,35 +30,35 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 	arguments_struct * args = malloc(sizeof(arguments_struct));
 	
 	if(argc != 5){
-		fprintf(stderr, "4 arguments are required\n");
-		exit(1);
+		fprintf(stderr, "Se requieren 4 argumentos\n");
+		showHow();
 	}
 	
 	if(strlen(argv[1]) != 1){
-		fprintf(stderr, "first argument must be 'd' or 'r'\n");
-		exit(1);
+		fprintf(stderr, "El primer argumento tiene que ser 'd' o 'r'\n");
+		showHow();
 	}
 
 	args->func = *argv[1];
 	
 	if (args->func != 'd' && args->func != 'r'){
-		fprintf(stderr, "first argument must be 'd' or 'r'\n");
-		exit(1);
+		fprintf(stderr, "El primer argumento tiene que ser 'd' o 'r'\n");
+		showHow();
 	}
 
 	args->secretImage = argv[2];
 
 	args->k = atoi(argv[3]);
 	if (args->k < 4 || args->k > 6){
-		fprintf(stderr, "k must be 4, 5 or 6\n");
-		exit(1);
+		fprintf(stderr, "k tiene que valer 4, 5 o 6\n");
+		showHow();
 	}
 
 	args->directorio = argv[4];
 	DIR * d = opendir(args->directorio);
 	if(!d){
-		fprintf(stderr, "Directory must exists\n");
-		exit(1);
+		fprintf(stderr, "El directorio tiene que existir\n");
+		showHow();
 	}
 	struct dirent * dir;
 	int fileCounter = 0;
@@ -73,7 +74,6 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 					strcpy(args->images[fileCounter], args->directorio);
 					strcat(args->images[fileCounter],dir->d_name);
 					args->images[fileCounter][strlen(args->directorio) + strlen(dir->d_name)] = '\0';
-					// printf("total size: %d, actual len: %d\n",strlen(args->directorio) + strlen(dir->d_name) + 1,strlen(args->images[fileCounter]));
 					fileCounter++;
 				}
 			}
@@ -83,8 +83,8 @@ arguments_struct * checkArguments(int argc, char *argv[]){
 	args->n = fileCounter;
 	
 	if(args->n < args->k){
-		fprintf(stderr, "There must be at least k images.\n");
-		exit(1);
+		fprintf(stderr, "Deben haber al menos n=%d imagenes dentro del directorio especificado.\n",args->k);
+		showHow();
 	}
 
 	return args;
@@ -94,7 +94,7 @@ void distribution(arguments_struct* args){
 
 	int k = args->k;
 
-	//llamamos a anlaize image para la imagens que uqeremos ocultar
+	//llamamos a analize image para la imagens que queremos ocultar
 	IMAGEDATA * image_data = analizeImage(args->secretImage, 0);
 
 	
@@ -103,7 +103,7 @@ void distribution(arguments_struct* args){
 	int host_image_count = args->n;
 	
 	//alocar espacio para el array la data de imagenes portadoras del secreto
-	IMAGEDATA ** host_images = malloc(sizeof(IMAGEDATA) * host_image_count);
+	IMAGEDATA ** host_images = malloc(sizeof(IMAGEDATA*) * host_image_count);
 
 	// llamamos analize image para todas las imagenes donde se va a ocultar el mensaje
 	for(int n=0; n<host_image_count; n+=1){
@@ -180,7 +180,7 @@ void recompilation(arguments_struct* args){
 	int host_image_count = args->n;
 
 	//alocar espacio para el array la data de imagenes portadoras del secreto
-	IMAGEDATA ** host_images = malloc(sizeof(IMAGEDATA) * host_image_count);
+	IMAGEDATA ** host_images = malloc(sizeof(IMAGEDATA*) * host_image_count);
 
 	// llamamos analize image para todas las imagenes donde se va a ocultar el mensaje
 	for(int n=0; n<host_image_count; n+=1){
@@ -244,4 +244,9 @@ int valueIsPresent(uint8_t * valuesOfX, int valuesOfXSize, uint8_t x){
 		}
 	}
 	return 0;
+}
+
+static void showHow(){
+	puts("El programa debe ser ejecutado con los siguientes argumentos:\n\t- d o r:\n\t\t- d: indica que se va a distribuir una imagen secreta en otras imágenes.\n\t\t- r: indica que se va a recuperar una imagen secreta a partir de otras imágenes.\n\t- pathImagen: Corresponde al path de un archivo de extensión .bmp. En el caso de que se haya elegido la opción 'd' este archivo debe existir ya que es la imagen a ocultar y debe ser una imagen en blanco y negro (8 bits por pixel). Si se eligió la opción 'r' este archivo será el archivo de salida (puede no existir preveo a la ejecución del programa), con la imagen secreta revelada al finalizar el programa.\n\t- k: El número corresponde a la cantidad mínima de sombras necesarias para recuperar el secreto en un esquema (k, n). Puede valer 4,5 o 6.\n\t- directorio: El path al directorio donde se encuentran las imágenes en las que se distribuirá el secreto (en el caso de que se haya elegido la opción d), o donde están las imágenes que contienen oculto el secreto ( en el caso de que se haya elegido la opción r). Debe contener imágenes de extensión .bmp, de 8 bits por pixel, de igual tamaño que la imagen secreta y por lo menos k imágenes en el directorio.\n\nEjemplo de ejecución: ./main d images/Albert.bmp 4 shades/");
+	exit(EXIT_FAILURE);
 }

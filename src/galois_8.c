@@ -299,8 +299,6 @@ uint8_t g_mult(uint8_t s1, uint8_t s2){
 uint8_t g_mult_alt(uint8_t s1, uint8_t s2){
     uint16_t total = 0;
     uint8_t shift = 1;
-    // 0110 y 0011
-    // x^2+x y x+1 --> 1100 XOR 0110 = 1010
     for (uint8_t i = 0; i < 8;i++){
 
         if((s2 & shift) == shift){

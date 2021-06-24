@@ -32,29 +32,6 @@ typedef struct tagBITMAPINFOHEADER
 
 
 
-void showBmpHead(BITMAPFILEHEADER pBmpHead) 
-{  //Define the function of displaying information, pass in the file header structure
-    printf("BMP file size: %dkb\n", pBmpHead.bfSize/1024);
-    printf("Reserved words must be 0: %d\n",  pBmpHead.bfReserved1);
-    printf("Reserved words must be 0: %d\n",  pBmpHead.bfReserved2);
-    printf("Offset bytes of actual bitmap data: %d\n", pBmpHead.bfOffBits);
-}
-
-void showBmpInfoHead(BITMAPINFOHEADER pBmpinfoHead) 
-{//Define the function to display the information, and the information header structure is passed in
-   printf("Bitmap Information Header:\n" );   
-   printf("The size of the message header: %d\n" ,pBmpinfoHead.biSize);   
-   printf("Bitmap width: %d\n" ,pBmpinfoHead.biWidth);   
-   printf("Bitmap height: %d\n" ,pBmpinfoHead.biHeight);   
-   printf("The number of planes of the image (the number of planes is the number of palettes, the default is 1 palette): %d\n" ,pBmpinfoHead.biPlanes);   
-   printf("Number of bits per pixel: %d\n" ,pBmpinfoHead.biBitCount);   
-   printf("Compression method:%d\n" ,pBmpinfoHead.biCompression);   
-   printf("Image size: %d\n" ,pBmpinfoHead.biSizeImage);   
-   printf("Horizontal resolution: %d\n" ,pBmpinfoHead.biXPelsPerMeter);   
-   printf("Vertical resolution: %d\n" ,pBmpinfoHead.biYPelsPerMeter);   
-   printf("Number of colors used: %d\n" ,pBmpinfoHead.biClrUsed);   
-   printf("Number of important colors: %d\n" ,pBmpinfoHead.biClrImportant);   
-}
 
 IMAGEDATA * analizeImage(char *path, int flip){
 
@@ -68,8 +45,8 @@ IMAGEDATA * analizeImage(char *path, int flip){
     fp = fopen(path, "rb");//Read the image.bmp file in the same directory.
     if(fp == NULL)
     {
-        printf("Failed to open'image.bmp'!\n");
-        exit(1);
+        fprintf(stderr, "No se pudo abrir la imagen: '%s'!\n",path);
+        exit(EXIT_FAILURE);
     }
     //If you do not read the bifType first, according to the C language structure Sizeof operation rule-the whole is greater than the sum of the parts, resulting in misalignment of the read file
     uint16_t  fileType;   
@@ -119,25 +96,6 @@ IMAGEDATA * analizeImage(char *path, int flip){
     imageData->biHeight = infoHeader.biHeight;
     imageData->biSize = infoHeader.biWidth * infoHeader.biHeight;
     imageData->bfOffBits = fileHeader.bfOffBits;
-    // imageData->fileHeader = fileHeader;
-    // imageData->infoHeader = infoHeader;
-//////////////////////////////////////////
-
-	// for(int i =0; i< (int) (imageData->biSize); i++){
-	// 	if(i%infoHeader.biWidth == 0){
-	// 		printf("\n");
-	// 	}
-	// 	printf("[%x]", *(bitmapImage+i));
-	// }
-
-    // for(int i =0; i< 600; i++){
-	// 	if(i%infoHeader.biWidth == 0){
-	// 		printf("\n");
-	// 	}
-	// 	printf("[%x]", *(bitmapImage+i));
-	// }
-
-/////////////////////////////////////////
 
     //close file and return bitmap iamge data
     fclose(fp);
@@ -214,8 +172,6 @@ int createImage(char * inputPath, IMAGEDATA * input_image_data, char * outputPat
     fp_write = fopen(outputPath, "wb");//Read the image.bmp file in the same directory.
     fwrite(header, 1,input_image_data->bfOffBits,fp_write);
 
-    // // uint8_t asd[2] = {105,105};
-    // IMAGEDATA * imageData = analizeImage(inputPath, 0);
     IMAGEDATA image_data = {
         bitmapImage,
         input_image_data->biWidth,         
@@ -223,11 +179,8 @@ int createImage(char * inputPath, IMAGEDATA * input_image_data, char * outputPat
         input_image_data->biSize,
         input_image_data->bfOffBits
     };
-    // input_image_data->bitmapImage = bitmapImage;
-    // fseek(fp, imageData->bfOffBits, SEEK_SET);
-    // // fwrite(asd, 1, 2, fp);
-    // fwrite(bitmapImage, 1, imageData->biWidth * imageData->biHeight, fp);
-    // //close file 
+
+    //close file 
     fclose(fp_read);
     fclose(fp_write);
     updateImageData(outputPath, &image_data, 0);
